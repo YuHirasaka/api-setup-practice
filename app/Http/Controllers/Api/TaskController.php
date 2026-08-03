@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\TaskResource;
 use App\Models\Task;
 use Illuminate\Http\Request;
 
@@ -16,9 +17,7 @@ class TaskController extends Controller
         // user_id = 1 のタスクを取得
         $tasks = Task::where('user_id', 1)->get();
 
-        return response()->json([
-            'data' => $tasks
-        ], 200);
+        return TaskResource::collection($tasks);
     }
 
     /**
@@ -41,10 +40,10 @@ class TaskController extends Controller
 
         $task = Task::create($data);
 
-        return response()->json([
-            'message' => 'タスクを作成しました',
-            'data' => $task
-        ], 201);
+        return (new TaskResource($task))
+            ->additional(['message' => 'タスクを作成しました'])
+            ->response()
+            ->setStatusCode(201);
     }
 
     /**
@@ -62,9 +61,7 @@ class TaskController extends Controller
             ], 404);
         }
 
-        return response()->json([
-            'data' => $task
-        ], 200);
+        return new TaskResource($task);
     }
 
     /**
@@ -93,9 +90,8 @@ class TaskController extends Controller
         // タスクを更新
         $task->update($validated);
 
-        return response()->json([
-            'message' => 'タスクを更新しました'
-        ], 200);
+        return (new TaskResource($task))
+            ->additional(['message' => 'タスクを更新しました']);
     }
 
     /**
