@@ -52,14 +52,7 @@ class TaskController extends Controller
     public function show(string $id)
     {
         //　タスクを取得
-        $task = Task::where('user_id', 1)->find($id);
-
-        // タスクが見つからない場合
-        if (!$task) {
-            return response()->json([
-                'message' => 'タスクが見つかりません',
-            ], 404);
-        }
+        $task = Task::where('user_id', 1)->findOrFail($id);
 
         return new TaskResource($task);
     }
